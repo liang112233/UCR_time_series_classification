@@ -26,21 +26,17 @@ def readucr(filename):
     X = data[:,1:7000]
     return X, Y
   
-nb_epochs = 100
+nb_epochs = 800
 
 
-#flist = ['Adiac', 'Beef', 'CBF', 'ChlorineConcentration', 'CinC_ECG_torso', 'Coffee', 'Cricket_X', 'Cricket_Y', 'Cricket_Z', 
-#'DiatomSizeReduction', 'ECGFiveDays', 'FaceAll', 'FaceFour', 'FacesUCR', '50words', 'FISH', 'Gun_Point', 'Haptics', 
-#'InlineSkate', 'ItalyPowerDemand', 'Lighting2', 'Lighting7', 'MALLAT', 'MedicalImages', 'MoteStrain', 'NonInvasiveFatalECG_Thorax1', 
-#'NonInvasiveFatalECG_Thorax2', 'OliveOil', 'OSULeaf', 'SonyAIBORobotSurface', 'SonyAIBORobotSurfaceII', 'StarLightCurves', 'SwedishLeaf', 'Symbols', 
-#'synthetic_control', 'Trace', 'TwoLeadECG', 'Two_Patterns', 'uWaveGestureLibrary_X', 'uWaveGestureLibrary_Y', 'uWaveGestureLibrary_Z', 'wafer', 'WordsSynonyms', 'yoga']
+flist = ['360', 'Aliexpress', 'Alipay', 'Amazon', 'Baidu', 'Bing', 'Blogger', 'China.com', 'Csdn','Ebay', 'Facebook', 'Google', 'Instagram', 'Jd', 'Live', 'Microsoft', 'Myshopify', 'Naver',
+'Netflix', 'Office', 'Okezone', 'Qq', 'Reddit', 'Sina.com', 'Sohu', 'Taobao', 'Tianya', 'Tmall', 'Tribunnews', 'Twitch', 'Vk', 'Weibo', 'Wikipedia', 'Xinhuanet', 'Yahoo', 'Youtube', 'Zoom']
 
-# flist = ['Adiac']
-flist = ['dell']
+
 for each in flist:
-    fname = each
-    x_train, y_train = readucr(fname+'/'+fname+'_TRAIN')
-    x_test, y_test = readucr(fname+'/'+fname+'_TEST')
+    fname = "bin/" + each
+    x_train, y_train = readucr(fname+'/'+each+'_TRAIN')
+    x_test, y_test = readucr(fname+'/'+each+'_TEST')
     nb_classes = len(np.unique(y_test))
     batch_size = min(x_train.shape[0]/10, 16)
     
@@ -92,17 +88,17 @@ for each in flist:
               verbose=1, validation_data=(x_test, Y_test), callbacks = [reduce_lr])
 
 
-    tf.saved_model.save(model, 'test_model_big')
+    tf.saved_model.save(model, 'abc' + '/' + each)
 
     #Print the testing results which has the lowest training loss.
     log = pd.DataFrame(hist.history)
     print(log.loc[log['loss'].idxmin]['loss'], log.loc[log['loss'].idxmin]['accuracy'])
 
-    kkk = open("results", "w")
-    predictions = model.predict(x_train)
-    for pred in predictions:
-        kkk.write(str(np.max(pred)) + "\t" + str(np.argmax(pred)))
-        kkk.write("\n")
+    # kkk = open("results", "w")
+    # predictions = model.predict(x_train)
+    # for pred in predictions:
+    #     kkk.write(str(np.max(pred)) + "\t" + str(np.argmax(pred)))
+    #     kkk.write("\n")
 
 #
 # ############## Get CAM ################

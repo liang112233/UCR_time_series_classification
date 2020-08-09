@@ -103,45 +103,52 @@ def build_resnet(input_shape, n_feature_maps, nb_classes):
     out = keras.layers.Dense(nb_classes, activation='softmax')(full)
     print ('        -- model was built.')
     return x, out
- 
-       
+
+
 def readucr(filename):
-    data = np.loadtxt(filename, delimiter = ',')
-    Y = data[:,0]
-    X = data[:,1:7000]
+    data = np.loadtxt(filename, delimiter=',')
+    Y = data[:, 0]
+    X = data[:, 1:7000]
     return X, Y
-   
-nb_epochs = 50
- 
- 
-#flist = ['Adiac', 'Beef', 'CBF', 'ChlorineConcentration', 'CinC_ECG_torso', 'Coffee', 'Cricket_X', 'Cricket_Y', 'Cricket_Z', 
-#'DiatomSizeReduction', 'ECGFiveDays', 'FaceAll', 'FaceFour', 'FacesUCR', '50words', 'FISH', 'Gun_Point', 'Haptics', 
-#'InlineSkate', 'ItalyPowerDemand', 'Lighting2', 'Lighting7', 'MALLAT', 'MedicalImages', 'MoteStrain', 'NonInvasiveFatalECG_Thorax1', 
-#'NonInvasiveFatalECG_Thorax2', 'OliveOil', 'OSULeaf', 'SonyAIBORobotSurface', 'SonyAIBORobotSurfaceII', 'StarLightCurves', 'SwedishLeaf', 'Symbols', 
-#'synthetic_control', 'Trace', 'TwoLeadECG', 'Two_Patterns', 'uWaveGestureLibrary_X', 'uWaveGestureLibrary_Y', 'uWaveGestureLibrary_Z', 'wafer', 'WordsSynonyms', 'yoga']
 
-# flist  = ['Adiac']
 
-flist  = ['dell']
+def normalizelist(x):
+    z = []
+    for y in x:
+        ymax = max(y)
+        ymin = min(y)
+        w = []
+        for i in range(len(y)):
+            w.append((y[i] - ymin) / (ymax - ymin))
+        z.append(w)
+    return np.array(z)
+
+
+nb_epochs = 1000
+
+# flist = ['360', 'Aliexpress', 'Alipay', 'Amazon', 'Baidu', 'Bing', 'Blogger', 'China.com', 'Csdn', 'Ebay', 'Facebook',
+#          'Google', 'Instagram', 'Jd', 'Live', 'Microsoft', 'Myshopify', 'Naver',
+#          'Netflix', 'Office', 'Okezone', 'Qq', 'Reddit', 'Sina.com', 'Sohu', 'Taobao', 'Tianya', 'Tmall', 'Tribunnews',
+#          'Twitch', 'Vk', 'Weibo', 'Wikipedia', 'Xinhuanet', 'Yahoo', 'Youtube', 'Zoom']
+flist = ['x1']
 for each in flist:
     fname = each
-    x_train, y_train = readucr(fname+'/'+fname+'_TRAIN')
-    x_test, y_test = readucr(fname+'/'+fname+'_TEST')
+
+    x_train, y_train = readucr(fname + '/' + each + '_TRAIN')
+    x_test, y_test = readucr(fname + '/' + each + '_TEST')
     nb_classes = len(np.unique(y_test))
-    batch_size = min(x_train.shape[0]/10, 16)
-     
+    batch_size = min(x_train.shape[0] / 10, 16)
+
     y_train = (y_train - y_train.min())/(y_train.max()-y_train.min())*(nb_classes-1)
     y_test = (y_test - y_test.min())/(y_test.max()-y_test.min())*(nb_classes-1)
      
      
     Y_train = keras.utils.to_categorical(y_train, nb_classes)
     Y_test = keras.utils.to_categorical(y_test, nb_classes)
-     
-    x_train_mean = x_train.mean()
-    x_train_std = x_train.std()
-    x_train = (x_train - x_train_mean)/(x_train_std)
-      
-    x_test = (x_test - x_train_mean)/(x_train_std)
+
+    x_train = normalizelist(x_train)
+    x_test = normalizelist(x_test)
+
     x_train = x_train.reshape(x_train.shape + (1,1,))
     x_test = x_test.reshape(x_test.shape + (1,1,))
      
@@ -160,13 +167,18 @@ for each in flist:
     log = pd.DataFrame(hist.history)
     print(log.loc[log['loss'].idxmin]['loss'], log.loc[log['loss'].idxmin]['accuracy'])
 
-    tf.saved_model.save(model, 'ResNet')
-
-    kkk = open("ResNet_results", "w")
-    predictions = model.predict(x_train)
-    for pred in predictions:
-        kkk.write(str(np.max(pred)) + "\t" + str(np.argmax(pred)))
-        kkk.write("\n")
+    tf.saved_model.save(model, 'Res1000' + '/' + each)
 
 
 
+
+    # tf.saved_model.save(model, 'ResNet')
+    #
+    # kkk = open("ResNet_results", "w")
+    # predictions = model.predict(x_train)
+    # for pred in predictions:
+    #     kkk.write(str(np.max(pred)) + "\t" + str(np.argmax(pred)))
+    #     kkk.write("\n")
+    #
+    #
+    #

@@ -124,15 +124,15 @@ def normalizelist(x):
     return np.array(z)
 
 
-nb_epochs = 1000
+nb_epochs = 100
 
-# flist = ['360', 'Aliexpress', 'Alipay', 'Amazon', 'Baidu', 'Bing', 'Blogger', 'China.com', 'Csdn', 'Ebay', 'Facebook',
-#          'Google', 'Instagram', 'Jd', 'Live', 'Microsoft', 'Myshopify', 'Naver',
-#          'Netflix', 'Office', 'Okezone', 'Qq', 'Reddit', 'Sina.com', 'Sohu', 'Taobao', 'Tianya', 'Tmall', 'Tribunnews',
-#          'Twitch', 'Vk', 'Weibo', 'Wikipedia', 'Xinhuanet', 'Yahoo', 'Youtube', 'Zoom']
-flist = ['x1']
+flist = ['360', 'Aliexpress', 'Alipay', 'Amazon', 'Baidu', 'Bing', 'Blogger', 'China.com', 'Csdn', 'Ebay', 'Facebook',
+         'Google', 'Instagram', 'Jd', 'Live', 'Microsoft', 'Myshopify', 'Naver',
+         'Netflix', 'Office', 'Okezone', 'Qq', 'Reddit', 'Sina.com', 'Sohu', 'Taobao', 'Tianya', 'Tmall', 'Tribunnews',
+         'Twitch', 'Vk', 'Weibo', 'Wikipedia', 'Xinhuanet', 'Yahoo', 'Youtube', 'Zoom']
+# flist = ['x1']
 for each in flist:
-    fname = each
+    fname = "con/"+each
 
     x_train, y_train = readucr(fname + '/' + each + '_TRAIN')
     x_test, y_test = readucr(fname + '/' + each + '_TEST')
@@ -167,7 +167,7 @@ for each in flist:
     log = pd.DataFrame(hist.history)
     print(log.loc[log['loss'].idxmin]['loss'], log.loc[log['loss'].idxmin]['accuracy'])
 
-    tf.saved_model.save(model, 'Res1000' + '/' + each)
+    tf.saved_model.save(model, 'Res100' + '/' + each)
 
 
 
